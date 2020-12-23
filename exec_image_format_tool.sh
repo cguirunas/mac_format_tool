@@ -8,16 +8,22 @@ function chooseMethod () {
     echo " ####################################################################################################################"
     echo
     echo "   SELECTED DISK: /DEV/DISK($DISK)   (This disk will be formatted with the .ISO, .IMG or .DMG file)"
+    if test "${DISK+true}"; then
+        diskutil info /dev/disk$DISK | grep "Device / Media Name:"
+        diskutil info /dev/disk$DISK | grep "Disk Size:"
+    fi
+    
+    echo
     echo "   SELECTED .ISO FILE: ($ISO)        (This .ISO file will be used to format the DISK($DISK))"
     echo "   SELECTED .IMG FILE: ($IMG)        (This .IMG file will be used to format the DISK($DISK))"
     echo "   SELECTED .DMG FILE: ($DMG)        (This .DMG file will be used to format the DISK($DISK))"
     echo
     echo "[10] - LIST DISKS AND SELECT THE DISK($DISK) TO BE FORMATTED"
-    echo "[11] - SELECT .ISO FILE AT $PWD"
-    echo "[12] - SELECT .IMG FILE AT $PWD"
-    echo "[13] - SELECT .DMG FILE AT $PWD"
+    echo "[11] - SELECT .ISO FILE AT $PWD     (Select this file if you're going to use a .ISO file to format)"
+    echo "[12] - SELECT .IMG FILE AT $PWD     (Select this file if you're going to use a .IMG file to format)"
+    echo "[13] - SELECT .DMG FILE AT $PWD     (Select this file if you're going to use a .DMG file to format)"
     echo 
-    echo "[20] - UNMOUNT DISK ($DISK)       (You need to EJECT the DISK$DISK before in order to FORMAT)" 
+    echo "[20] - UNMOUNT DISK ($DISK)       (You need to EJECT the DISK$DISK before to FORMAT)" 
     echo "[21] - EJECT DISK ($DISK)"         
     echo
     echo "[30] - CONVERT .ISO($ISO) TO .IMG($IMG)"
@@ -181,6 +187,8 @@ function chooseCONVERT_ISO_IMG () {
     
     echo "PLEASE WAIT..."
     hdiutil convert -format UDRW -o $IMG $ISO
+    echo "RENAMING FILE $IMG.DMG TO $IMG..."
+    mv $IMG.dmg $IMG
     echo "Done!"
     read -r
     chooseMethod DISK ISO IMG DMG
@@ -200,6 +208,20 @@ function chooseFORMAT_IMG () {
             read -r
             chooseMethod DISK ISO IMG DMG
         else
+
+            # CHECK IS DISK IS SELECTED
+            if test ! "${DISK+true}"; then
+                echo "You must SELECT the DISK before UNMOUNT it (Please, verify the options of this FORMAT TOOL to do this STEP)"
+                read -r
+                chooseMethod DISK ISO IMG DMG
+            else
+                echo "UNMOUNT DISK($DISK)..."
+            fi
+            
+            echo "PLEASE WAIT..."
+            diskutil unmountDisk /dev/disk$DISK
+            echo "Done!"
+
             echo "FORMATTING DISK($DISK) WITH THE .IMG($IMG) FILE..."
         fi
     fi
@@ -225,9 +247,25 @@ function chooseFORMAT_DMG () {
             read -r
             chooseMethod DISK ISO IMG DMG
         else
+
+            # CHECK IS DISK IS SELECTED
+            if test ! "${DISK+true}"; then
+                echo "You must SELECT the DISK before UNMOUNT it (Please, verify the options of this FORMAT TOOL to do this STEP)"
+                read -r
+                chooseMethod DISK ISO IMG DMG
+            else
+                echo "UNMOUNT DISK($DISK)..."
+            fi
+            
+            echo "PLEASE WAIT..."
+            diskutil unmountDisk /dev/disk$DISK
+            echo "Done!"
+
             echo "FORMATTING $DISK WITH THE .DMG($DMG) FILE..."
         fi
     fi
+
+    chooseUNMOUNT DISK ISO IMG DMG
 
     echo "PLEASE WAIT..."
     sudo dd if=$DMG of=/dev/rdisk$DISK bs=1m
