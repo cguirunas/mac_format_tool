@@ -37,7 +37,7 @@ You can use this script to facilitate the formatting process.
 
 [*]  - Don't know, 
 
- Choose your option (pass any other key to exit) 
+ Choose your option (press any other key to exit) 
  ```
- 
+
 

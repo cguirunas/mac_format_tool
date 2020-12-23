@@ -35,7 +35,7 @@ function chooseMethod () {
     echo
     echo "[*]  - Don't know, "
     echo
-    read -n3 -p " Choose your option (pass any other key to exit) " option
+    read -n3 -p " Choose your option (press any other key to exit) " option
     case $option in
         10) echo " - LIST DISKS AND SELECT THE DISK($DISK) TO BE FORMATTED" ; chooseLISTDISKS $DISK $ISO $IMG $DMG; exit ;;
         11) echo " - SELECT .ISO($ISO) FILE AT $PWD" ; chooseISO $DISK $ISO $IMG $DMG; exit ;;
